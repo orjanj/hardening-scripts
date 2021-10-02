@@ -1,11 +1,17 @@
 #!/bin/bash
-# Script by Ørjan Jacobsen <oaj@oaj.guru>
+# Check if the user is root
 if [[ $EUID -ne 0 ]]; then
     echo "Error: You are not root. This should be executed as root."
+
+# If the user is root, continue
 else
     username=$1
+
+    # If the input for the script is blank - return help menu
     if [ -z $username ]; then
         echo "Script usage: bash $0 <username>";
+
+    # Check if it already exists an Google Authenticator file and remove the MFA for the user
     else
         if [ -f "/home/${username}/.google_authenticator" ]; then
             echo "Found google authenticator file for the user ${username}."

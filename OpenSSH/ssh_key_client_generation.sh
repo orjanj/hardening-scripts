@@ -1,8 +1,9 @@
 #!/bin/bash
-# Script by Ørjan Jacobsen <oaj@oaj.guru>
+# Default variables for key destinations
 ssh_key_dir=$HOME/.ssh
 key_name=id_rsa
 
+# Create a function for prompt the user for reviewing the key pair
 function prompt_view_keys() {
     ssh_dir=$1
     key=$2
@@ -25,6 +26,7 @@ function prompt_view_keys() {
     fi
 }
 
+# Prompt the user of keypair creation and check existence of keys
 read -p "Do you want to create a SSH keypair? [y]" -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
