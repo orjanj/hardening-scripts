@@ -8,57 +8,10 @@ normal=$(tput sgr0)
 if [[ $EUID -ne 0 ]]; then
     echo "Error: You are not root. This should be executed as root."
 else
-# #if sudo apt install $google_auth_pkg -y > /dev/null || dpkg -l | grep $google_auth_pkg; then
-# if dpkg -l | grep $google_auth_pkg > /dev/null; then
-#     echo "${google_auth_pkg} is installed."
-# elif sudo apt install $google_auth_pkg -y > /dev/null; then
-#     echo "Successfully installed ${google_auth_pkg}."
-# else
-#     echo "Error: ${google_auth_pkg} is not installed."
-#     exit
-# fi
-
-# # Window size
-# read -p "Enter determined window size for tokens [3]: " -n 1 -r window_size
-# # Set default window size if parameter is blank
-# if [ -z $window_size ]; then
-#     window_size=3
-# fi
-
-# # Backup codes
-# read -p "Enter number of emergency backup codes [10]: " -r backup_codes
-# if [ -z $backup_codes ]; then
-#     backup_codes=10
-# fi
-
-# # Allowed logins pr. x second
-# read -p "Enter number of allowed logins every 30 seconds [3]: " -r allowed_logins
-# if [ -z $allowed_logins ]; then
-#     allowed_logins=3
-# fi
-
-# # View Google Authenticator configurations
-# echo
-# echo "${bold}Viewing Google authenticator configuration:${normal}"
-# echo "Using TOTP authentication"
-# echo "Writing configuration to: ~/.google_authenticator"
-# echo "Allowing reuse of previously used tokens"
-# echo "${bold}Allowed window size:${normal} ${window_size}"
-# echo "Generating ${backup_codes} backup codes"
-# echo "Allowing ${allowed_logins} logins each 30 seconds"
-# echosed -i -e "s/^\@include common-auth/#\@include common-auth/g"
-#     exit
-# fi
-
-
-# exit
-
-
 
     # Check if Google Authenticator is set up in pam.d
-    google_pam=$(grep "pam_google_authenticator" ${pamd_sshd})
-#    if [ -z $(grep "pam_google_authenticator" ${pamd_sshd} > /dev/null) ]; then
-    if [[ -z $google_pam ]]; then
+#    google_pam=$(grep "pam_google_authenticator" ${pamd_sshd})
+    if [[ -z $(grep "pam_google_authenticator" ${pamd_sshd}) ]]; then
 
         read -p "Do you want users to be able to log in if 2FA is not generated yet? [y]" -n 1 -r 
         if [[ $REPLY =~ ^[Yy]$ ]] || [ -z $REPLY ]; then
@@ -72,9 +25,6 @@ else
             echo "Error: Could not add required line to ${pamd_sshd}"
         fi
     fi
-
-#    if sudo sed -i -e "s/^.*AuthenticationMethods.*$/AuthenticationMethods publickey,keyboard-interactive/g" $sshd_config; then
-
 
     # Deactivate password authentication
     if [[ ! -z $(grep ^"@include common-auth" ${pamd_sshd}) ]]; then
@@ -129,7 +79,6 @@ else
 
 
     # Configure 2FA for `sudo`
-#auth    required                        pam_permit.so
     if [[ ! -z $(grep "^#.*pam_permit.so$" /etc/pam.d/common-auth) ]]; then
         if sed -i -e "s/^#.*pam_permit.so$/auth required pam_permit.so/g" /etc/pam.d/common-auth; then
             echo "Successfully uncommented pam_permit.so"
