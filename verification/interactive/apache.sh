@@ -58,7 +58,7 @@ else
     site_path="${enabled_sites}/${site_config}"
 
     # Check file existence of delivered config
-    if [ -f "cnd-orig.conf" ]; then
+    if [ -f "${delivery_config_path}/${orig_config}" ]; then
         echo "Delivered config file is found ${orig_config}"
     else
         echo "Error: Delivered config file not found."
@@ -92,10 +92,14 @@ else
         echo "The key must be named ${ssl_key}."
         confirm_prompt "Do you want to copy the private key to ${ssl_key_path} [y]"
         if [ $? -eq 0 ]; then
-            if cp "$delivery_config_path}/${ssl_key}" $ssl_key_path; then
-                echo "Successfully copied private key to ${ssl_key_path}."
+            if [ -f "${delivery_config_path}/${ssl_key}" ]; then
+                if cp "$delivery_config_path}/${ssl_key}" $ssl_key_path; then
+                    echo "Successfully copied private key to ${ssl_key_path}."
+                else
+                    echo "Error: Could not copy the private key to ${ssl_key_path}."
+                fi
             else
-                echo "Error: Could not copy the private key to ${ssl_key_path}."
+                echo "Could not find the ${ssl_key} in ${delivery_config_path}."
             fi
         fi
     fi
@@ -109,10 +113,14 @@ else
         echo "The key must be named ${ssl_crt}."
         confirm_prompt "Do you want to copy the public key to ${ssl_crt_path} [y]"
         if [ $? -eq 0 ]; then
-            if cp "${delivery_config_path}/${ssl_crt}" $ssl_crt_path; then
-                echo "Successfully copied public key to ${ssl_crt_path}."
+            if [ -f "${delivery_config_path}/${ssl_crt}" ]; then
+                if cp "${delivery_config_path}/${ssl_crt}" $ssl_crt_path; then
+                    echo "Successfully copied public key to ${ssl_crt_path}."
+                else
+                    echo "Error: Could not copy the public key to ${ssl_crt_path}."
+                fi
             else
-                echo "Error: Could not copy the public key to ${ssl_crt_path}."
+                echo "Could not find the ${ssl_crt} in ${delivery_config_path}."
             fi
         fi
     fi
@@ -137,7 +145,7 @@ else
         if [ -f "${apache_dir}/mods-enabled/${module}.load" ]; then
             echo "Module running: ${module}"
         else
-            echo "Module not running: ${module} (it must run to make the site work)"
+            echo "Module not running: ${module} (it must run to make the site work)"
             confirm_prompt "Do you want to enable the module ${module} [y]"
             if [ $? -eq 0 ]; then
                 if a2enmod $module; then
@@ -152,4 +160,14 @@ else
             fi
         fi
     done
+
+    # Reload the apache
+    confirm_prompt "Do you want to restart the Apache server [y]"
+    if [ $? -eq 0 ]; then
+        if systemctl restart apache2; then
+            echo "Apache successfully restarted."
+        else
+            echo "Error: Could not restart Apache."
+        fi
+    fi
 fi

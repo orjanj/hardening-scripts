@@ -51,7 +51,7 @@ else
     fi
 
     # Remove the duplicate ListenAddress line containing listening on everything
-    str_replace regex.test "^#ListenAddress ::" ""
+    str_replace $sshd_config "^#ListenAddress ::" ""
 
     # Check the Port parameter and attempt to change it if default
     feedback=$(get_param_from_file $sshd_config "^#Port|^Port")
@@ -71,7 +71,7 @@ else
     fi
 
     # Check the ListenAddress parameter and attempt to change it if default
-    feedback=$(get_param_from_file regex.test "^#ListenAddress|^ListenAddress")
+    feedback=$(get_param_from_file $sshd_config "^#ListenAddress|^ListenAddress")
     if [ ! -z $feedback ]; then
         echo "ListenAddress is set to: ${feedback}"
         confirm_prompt "Do you want to change this parameter [y]"
